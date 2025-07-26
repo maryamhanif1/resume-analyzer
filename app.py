@@ -1,4 +1,3 @@
-import requests
 import streamlit as st
 import os
 from docx import Document
@@ -31,7 +30,6 @@ st.title("AI-Powered Resume Analyzer")
 
 uploaded_file = st.file_uploader("Upload your resume (PDF or DOCX)", type=["pdf", "docx"])
 job_title = st.text_input("Enter the job title you want to apply for:")
-user_email = st.text_input("Enter your email to receive the analysis:")
 
 if st.button("Analyze Resume"):
 
@@ -39,8 +37,6 @@ if st.button("Analyze Resume"):
         st.error("Please upload a resume file.")
     elif not job_title.strip():
         st.error("Please enter the job title.")
-    elif not user_email.strip():
-        st.error("Please enter your email.")
     else:
         with open(uploaded_file.name, "wb") as f:
             f.write(uploaded_file.getbuffer())
@@ -76,21 +72,4 @@ Your analysis:
         st.subheader("Resume Analysis")
         st.write(analysis)
 
-        # Send the result to Zapier via webhook
-        zapier_webhook_url = "https://hooks.zapier.com/hooks/catch/23944697/uua5ui3/"
-
-        payload = {
-            "email": user_email,
-            "job_title": job_title,
-            "analysis": analysis,
-        }
-
-        try:
-            zapier_response = requests.post(zapier_webhook_url, json=payload)
-            if zapier_response.status_code == 200:
-                st.success("Analysis sent to your email!")
-            else:
-                st.warning("Failed to send analysis. Please try again later.")
-        except Exception as e:
-            st.error(f"Error sending to email: {e}")
 
