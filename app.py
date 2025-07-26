@@ -4,7 +4,6 @@ import os
 from docx import Document
 import pdfplumber
 from openai import OpenAI
-import requests
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
@@ -73,6 +72,25 @@ Your analysis:
         )
 
         analysis = response.choices[0].message.content
+
         st.subheader("Resume Analysis")
         st.write(analysis)
+
+        # Send the result to Zapier via webhook
+        zapier_webhook_url = "https://hooks.zapier.com/hooks/catch/23944697/uua5ui3/"
+
+        payload = {
+            "email": user_email,
+            "job_title": job_title,
+            "analysis": analysis,
+        }
+
+        try:
+            zapier_response = requests.post(zapier_webhook_url, json=payload)
+            if zapier_response.status_code == 200:
+                st.success("Analysis sent to your email!")
+            else:
+                st.warning("Failed to send analysis. Please try again later.")
+        except Exception as e:
+            st.error(f"Error sending to email: {e}")
 
